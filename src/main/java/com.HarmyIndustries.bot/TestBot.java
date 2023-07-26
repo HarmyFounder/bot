@@ -5,6 +5,7 @@ import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -20,7 +21,7 @@ public class TestBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotToken() {
-        return "token";
+        return "6510349148:AAHKFDMmSMpcmWnwu8m16x3K-Psd4gsRvNk";
     }
 
     public static void main(String[] args) throws TelegramApiException {
@@ -32,6 +33,16 @@ public class TestBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if(update.hasMessage()){
+        Message message = update.getMessage();
+        if(message.hasSticker()){
+            try {
+                execute(SendSticker.builder().chatId(message.getChatId().toString()).emoji(message.getSticker().getEmoji()).build());
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+        if(update.hasMessage()){
             Message message = update.getMessage();
             if(message.hasText()){
                 try {
@@ -41,5 +52,9 @@ public class TestBot extends TelegramLongPollingBot {
                 }
             }
         }
+
+
+
     }
+
 }
