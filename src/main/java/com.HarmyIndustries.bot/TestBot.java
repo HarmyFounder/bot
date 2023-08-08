@@ -29,7 +29,7 @@ public class TestBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotToken() {
-        return "token";
+        return "6510349148:AAHKFDMmSMpcmWnwu8m16x3K-Psd4gsRvNk";
     }
 
     public static void main(String[] args) throws TelegramApiException {
@@ -55,7 +55,7 @@ public class TestBot extends TelegramLongPollingBot {
         if (update.hasMessage()) {
             Message message = update.getMessage();
             System.out.println(message.getText());
-            if (message.hasText() && (message.getText().equals("анекдот")  || message.getText().equals("Анекдот"))) {
+            if (message.hasText() && (message.getText().equals("анекдот") || message.getText().equals("Анекдот"))) {
                 try {
 //                    execute(SendMessage.builder().chatId(message.getChatId().toString() ).text(message.getText()).build());
 
@@ -64,24 +64,43 @@ public class TestBot extends TelegramLongPollingBot {
                 } catch (TelegramApiException | IOException e) {
                     throw new RuntimeException(e);
                 }
-            }
-        } else {
-            Message message = update.getMessage();
+            } else if (update.hasMessage()) {
+                if (message.hasText() && (message.getText().equals("Дай жестокую цитату") || message.getText().equals("дай жестокую цитату") || message.getText().equals("цитатку")|| message.getText().equals("Цитатку")|| message.getText().equals("цитатка")|| message.getText().equals("Цитатка"))) {
+                    try {
+                        execute(SendMessage.builder().chatId(message.getChatId()).text(getQuote()).build());
+                    } catch (TelegramApiException | IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+            } else {
+                Message message1 = update.getMessage();
                 try {
-                    execute(SendMessage.builder().chatId(message.getChatId().toString()).text("не розумию").build());
+                    execute(SendMessage.builder().chatId(message1.getChatId().toString()).text("не розумию").build());
                 } catch (TelegramApiException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
+    }
 
+
+    public String getQuote() throws IOException {
+
+        List<String> quotes = getQuotes();
+
+        String quote = quotes.get((int) (Math.random() * 100 + 10));
+
+        return quote;
+
+    }
 
     public String getJoke() throws IOException {
 
         List<String> jokes = getJokes();
 
         String joke = jokes.get((int) (Math.random() * 100));
-        jokes.remove(joke);
+
         return joke;
     }
 
@@ -102,5 +121,20 @@ public class TestBot extends TelegramLongPollingBot {
 
     }
 
+    public List<String> getQuotes() throws IOException {
+
+        List<String> quoteList = new ArrayList<>();
+
+        Document doc = Jsoup.connect("https://7days.ru/lifestyle/family/patsanskie-tsitaty-otkroveniya-ulits-so-smyslom.htm").get();
+
+        Elements quotes = doc.getElementsByTag("p");
+
+        for (Element el : quotes) {
+            String quoteTxt = el.text();
+            quoteList.add(quoteTxt);
+        }
+
+        return quoteList;
+    }
 
 }
