@@ -40,21 +40,10 @@ public class TestBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-
+        Message message = update.getMessage();
+        System.out.println(message.getText());
         if (update.hasMessage()) {
-            Message message = update.getMessage();
-            if (message.hasSticker()) {
-                try {
-                    execute(SendSticker.builder().chatId(message.getChatId().toString()).emoji(message.getSticker().getEmoji()).build());
-                } catch (TelegramApiException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
 
-        if (update.hasMessage()) {
-            Message message = update.getMessage();
-            System.out.println(message.getText());
             if (message.hasText() && (message.getText().equals("анекдот") || message.getText().equals("Анекдот"))) {
                 try {
 //                    execute(SendMessage.builder().chatId(message.getChatId().toString() ).text(message.getText()).build());
@@ -64,8 +53,9 @@ public class TestBot extends TelegramLongPollingBot {
                 } catch (TelegramApiException | IOException e) {
                     throw new RuntimeException(e);
                 }
-            } else if (update.hasMessage()) {
-                if (message.hasText() && (message.getText().equals("Дай жестокую цитату") || message.getText().equals("дай жестокую цитату") || message.getText().equals("цитатку")|| message.getText().equals("Цитатку")|| message.getText().equals("цитатка")|| message.getText().equals("Цитатка"))) {
+            }
+
+                else if (message.hasText() && (message.getText().equals("цитатка") || message.getText().equals("Цитатка"))) {
                     try {
                         execute(SendMessage.builder().chatId(message.getChatId()).text(getQuote()).build());
                     } catch (TelegramApiException | IOException e) {
@@ -73,7 +63,15 @@ public class TestBot extends TelegramLongPollingBot {
                     }
                 }
 
-            } else {
+                else if (message.hasText() && (message.getText().equals("акари") || message.getText().equals("Акари"))) {
+                    try {
+                        execute(SendMessage.builder().chatId(message.getChatId()).text(getAkari()).build());
+                    } catch (TelegramApiException | IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+            else {
                 Message message1 = update.getMessage();
                 try {
                     execute(SendMessage.builder().chatId(message1.getChatId().toString()).text("не розумию").build());
@@ -85,6 +83,33 @@ public class TestBot extends TelegramLongPollingBot {
     }
 
 
+    public String getAkari() throws IOException {
+
+        List<String> photos = getPhotos();
+
+        String akari = photos.get((int) (Math.random()*10 + 7));
+
+        return akari;
+    }
+
+    public List<String> getPhotos() throws IOException {
+
+        List<String> photosList = new ArrayList<>();
+
+        Document doc = Jsoup.connect("https://www.zerochan.net/Watanabe+Akari").get();
+
+        Elements photos = doc.getElementsByTag("img");
+
+        for(Element el : photos){
+            photosList.add(el.attr("src"));
+        }
+
+        return photosList;
+
+    }
+
+
+
     public String getQuote() throws IOException {
 
         List<String> quotes = getQuotes();
@@ -94,6 +119,23 @@ public class TestBot extends TelegramLongPollingBot {
         return quote;
 
     }
+
+    public List<String> getQuotes() throws IOException {
+
+        List<String> quoteList = new ArrayList<>();
+
+        Document doc = Jsoup.connect("https://7days.ru/lifestyle/family/patsanskie-tsitaty-otkroveniya-ulits-so-smyslom.htm").get();
+
+        Elements quotes = doc.getElementsByTag("p");
+
+        for (Element el : quotes) {
+            String quoteTxt = el.text();
+            quoteList.add(quoteTxt);
+        }
+
+        return quoteList;
+    }
+
 
     public String getJoke() throws IOException {
 
@@ -121,20 +163,5 @@ public class TestBot extends TelegramLongPollingBot {
 
     }
 
-    public List<String> getQuotes() throws IOException {
-
-        List<String> quoteList = new ArrayList<>();
-
-        Document doc = Jsoup.connect("https://7days.ru/lifestyle/family/patsanskie-tsitaty-otkroveniya-ulits-so-smyslom.htm").get();
-
-        Elements quotes = doc.getElementsByTag("p");
-
-        for (Element el : quotes) {
-            String quoteTxt = el.text();
-            quoteList.add(quoteTxt);
-        }
-
-        return quoteList;
-    }
 
 }
