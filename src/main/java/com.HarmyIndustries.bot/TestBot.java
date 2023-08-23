@@ -34,7 +34,7 @@ public class TestBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotToken() {
-        return "token";
+        return "6510349148:AAHKFDMmSMpcmWnwu8m16x3K-Psd4gsRvNk";
     }
 
     public static void main(String[] args) throws TelegramApiException {
@@ -50,7 +50,7 @@ public class TestBot extends TelegramLongPollingBot {
 
             try {
                 handleMessage(update.getMessage());
-            } catch (TelegramApiException e) {
+            } catch (TelegramApiException | IOException e) {
                 throw new RuntimeException(e);
             }
 
@@ -99,7 +99,7 @@ public class TestBot extends TelegramLongPollingBot {
 //        }
     }
 
-    private void handleMessage(Message message) throws TelegramApiException {
+    private void handleMessage(Message message) throws TelegramApiException, IOException {
         if (message.hasText() && message.hasEntities()) {
             Optional<MessageEntity> commandEntity = message.getEntities().stream().filter(e -> "bot_command".equals(e.getType())).findFirst();
 
@@ -121,6 +121,12 @@ public class TestBot extends TelegramLongPollingBot {
                                 .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
                                 .build());
                         return;
+
+
+
+                    case "/akari":
+                        execute(SendMessage.builder().text(getAkari()).chatId(message.getChatId().toString()).build());
+
                 }
 
 
